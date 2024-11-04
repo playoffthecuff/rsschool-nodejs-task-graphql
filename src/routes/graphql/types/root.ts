@@ -96,7 +96,7 @@ export const RootQuery = new GraphQLObjectType({
     },
     profiles: {
       type: new GraphQLList(profile),
-      async resolve(_s,_a,c) {
+      async resolve(_s, _a, c) {
         return c.prisma.profile.findMany();
         // const d = await fetch(URL + 'profiles').then((r) => r.json());
         // return d;
@@ -113,13 +113,16 @@ export const Mutation = new GraphQLObjectType({
       args: {
         dto: { type: new GraphQLNonNull(CreateUser) },
       },
-      async resolve(_, { dto }) {
-        const d = await fetch(URL + 'users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dto),
-        }).then((r) => r.json());
-        return d;
+      async resolve(_, { dto }, c) {
+        return c.prisma.user.create({
+          data: dto,
+        });
+        // const d = await fetch(URL + 'users', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify(dto),
+        // }).then((r) => r.json());
+        // return d;
       },
     },
     createProfile: {
@@ -127,29 +130,35 @@ export const Mutation = new GraphQLObjectType({
       args: {
         dto: { type: new GraphQLNonNull(CreateProfile) },
       },
-      async resolve(_, { dto }) {
-        const d = await fetch(URL + 'profiles', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dto),
-        }).then((r) => r.json());
-        return d;
+      async resolve(_, { dto }, c) {
+        return c.prisma.profile.create({
+          data: dto,
+        });
+        // const d = await fetch(URL + 'profiles', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify(dto),
+        // }).then((r) => r.json());
+        // return d;
       },
     },
     createPost: {
       type: new GraphQLNonNull(post),
       args: { dto: { type: new GraphQLNonNull(CreatePost) } },
-      async resolve(_, { dto }) {
-        const d = await fetch(URL + 'posts', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dto),
-        }).then((r) => r.json());
-        return d;
+      async resolve(_, { dto }, c) {
+        return c.prisma.post.create({
+          data: dto,
+        });
+        // const d = await fetch(URL + 'posts', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify(dto),
+        // }).then((r) => r.json());
+        // return d;
       },
     },
     changePost: {
@@ -158,32 +167,42 @@ export const Mutation = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(UUIDType) },
         dto: { type: new GraphQLNonNull(ChangePost) },
       },
-      async resolve(_, { id, dto }) {
-        const d = await fetch(URL + 'posts/' + id, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dto),
-        }).then((r) => r.json());
-        return d;
+      resolve: async (parent, { id, dto }, c) => {
+        return c.prisma.post.update({
+          where: { id },
+          data: dto,
+        });
       },
     },
+    //     // const d = await fetch(URL + 'posts/' + id, {
+    //     //   method: 'PATCH',
+    //     //   headers: {
+    //     //     'Content-Type': 'application/json',
+    //     //   },
+    //     //   body: JSON.stringify(dto),
+    //     // }).then((r) => r.json());
+    //     // return d;
+    //   },
+    // },
     changeProfile: {
       type: new GraphQLNonNull(profile),
       args: {
         id: { type: new GraphQLNonNull(UUIDType) },
         dto: { type: new GraphQLNonNull(ChangeProfile) },
       },
-      async resolve(_, { id, dto }) {
-        const d = await fetch(URL + 'profiles/' + id, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dto),
-        }).then((r) => r.json());
-        return d;
+      async resolve(_, { id, dto }, c) {
+        return c.prisma.profile.update({
+          where: { id },
+          data: dto,
+        });
+        // const d = await fetch(URL + 'profiles/' + id, {
+        //   method: 'PATCH',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify(dto),
+        // }).then((r) => r.json());
+        // return d;
       },
     },
     changeUser: {
@@ -192,45 +211,67 @@ export const Mutation = new GraphQLObjectType({
         id: { type: new GraphQLNonNull(UUIDType) },
         dto: { type: new GraphQLNonNull(ChangeUser) },
       },
-      async resolve(_, { id, dto }) {
-        const d = await fetch(URL + 'users/' + id, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dto),
-        }).then((r) => r.json());
-        return d;
+      async resolve(_, { id, dto }, c) {
+        return c.prisma.user.update({
+          where: { id },
+          data: dto,
+        });
+        // const d = await fetch(URL + 'users/' + id, {
+        //   method: 'PATCH',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify(dto),
+        // }).then((r) => r.json());
+        // return d;
       },
     },
     deleteUser: {
       type: new GraphQLNonNull(GraphQLString),
       args: { id: { type: new GraphQLNonNull(UUIDType) } },
-      async resolve(_, { id }) {
-        const r = await fetch(URL + 'users/' + id, {
-          method: 'DELETE',
+      async resolve(_, { id }, c) {
+        await c.prisma.user.delete({
+          where: {
+            id,
+          },
         });
-        return r.status === 204 ? 'ok' : '!ok';
+        return 'ok';
+        // const r = await fetch(URL + 'users/' + id, {
+        //   method: 'DELETE',
+        // });
+        // return r.status === 204 ? 'ok' : '!ok';
       },
     },
     deletePost: {
       type: new GraphQLNonNull(GraphQLString),
       args: { id: { type: new GraphQLNonNull(UUIDType) } },
-      async resolve(_, { id }) {
-        const r = await fetch(URL + 'posts/' + id, {
-          method: 'DELETE',
+      async resolve(_, { id }, c) {
+        await c.prisma.post.delete({
+          where: {
+            id,
+          },
         });
-        return r.status === 204 ? 'ok' : '!ok';
+        return 'ok';
+        // const r = await fetch(URL + 'posts/' + id, {
+        //   method: 'DELETE',
+        // });
+        // return r.status === 204 ? 'ok' : '!ok';
       },
     },
     deleteProfile: {
       type: new GraphQLNonNull(GraphQLString),
       args: { id: { type: new GraphQLNonNull(UUIDType) } },
-      async resolve(_, { id }) {
-        const r = await fetch(URL + 'profiles/' + id, {
-          method: 'DELETE',
+      async resolve(_, { id }, c) {
+        await c.prisma.profile.delete({
+          where: {
+            id,
+          },
         });
-        return r.status === 204 ? 'ok' : '!ok';
+        return 'ok';
+        // const r = await fetch(URL + 'profiles/' + id, {
+        //   method: 'DELETE',
+        // });
+        // return r.status === 204 ? 'ok' : '!ok';
       },
     },
     subscribeTo: {
@@ -239,15 +280,22 @@ export const Mutation = new GraphQLObjectType({
         userId: { type: new GraphQLNonNull(UUIDType) },
         authorId: { type: new GraphQLNonNull(UUIDType) },
       },
-      async resolve(_, { userId, authorId }) {
-        const r = await fetch(URL + 'users/' + userId + '/user-subscribed-to', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+      async resolve(_, { userId, authorId }, c) {
+        await c.prisma.subscribersOnAuthors.create({
+          data: {
+            subscriberId: userId,
+            authorId: authorId,
           },
-          body: JSON.stringify({ authorId }),
         });
-        return r.status === 204 ? 'ok' : '!ok';
+        return 'ok';
+        // const r = await fetch(URL + 'users/' + userId + '/user-subscribed-to', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify({ authorId }),
+        // });
+        // return r.status === 204 ? 'ok' : '!ok';
       },
     },
     unsubscribeFrom: {
@@ -256,14 +304,23 @@ export const Mutation = new GraphQLObjectType({
         userId: { type: new GraphQLNonNull(UUIDType) },
         authorId: { type: new GraphQLNonNull(UUIDType) },
       },
-      async resolve(_, { userId, authorId }) {
-        const r = await fetch(
-          URL + 'users/' + userId + '/user-subscribed-to/' + authorId,
-          {
-            method: 'DELETE',
+      async resolve(_, { userId, authorId }, c) {
+        await c.prisma.subscribersOnAuthors.delete({
+          where: {
+            subscriberId_authorId: {
+              subscriberId: userId,
+              authorId: authorId,
+            },
           },
-        );
-        return r.status === 204 ? 'ok' : '!ok';
+        });
+        return 'ok';
+        // const r = await fetch(
+        //   URL + 'users/' + userId + '/user-subscribed-to/' + authorId,
+        //   {
+        //     method: 'DELETE',
+        //   },
+        // );
+        // return r.status === 204 ? 'ok' : '!ok';
       },
     },
   },
