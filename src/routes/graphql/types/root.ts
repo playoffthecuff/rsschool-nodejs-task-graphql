@@ -21,61 +21,85 @@ export const RootQuery = new GraphQLObjectType({
     memberType: {
       type: MemberType,
       args: { id: { type: MemberTypeId } },
-      async resolve(_, { id }) {
-        const d = await fetch(URL + 'member-types/' + id).then((r) => r.json());
-        return d;
+      async resolve(_, { id }, c) {
+        return c.prisma.memberType.findUnique({
+          where: {
+            id,
+          },
+        });
+        // const d = await fetch(URL + 'member-types/' + id).then((r) => r.json());
+        // return d;
       },
     },
     memberTypes: {
       type: new GraphQLList(MemberType),
-      async resolve() {
-        const d = await fetch(URL + 'member-types').then((r) => r.json());
-        return d;
+      async resolve(_s, _a, c) {
+        return c.prisma.memberType.findMany();
+        // const d = await fetch(URL + 'member-types').then((r) => r.json());
+        // return d;
       },
     },
     post: {
       type: post,
       args: { id: { type: UUIDType } },
-      async resolve(_, { id }) {
-        const d = await fetch(URL + 'posts/' + id).then((r) => r.json());
-        return d;
+      async resolve(_, { id }, c) {
+        return c.prisma.post.findUnique({
+          where: {
+            id,
+          },
+        });
+        // const d = await fetch(URL + 'posts/' + id).then((r) => r.json());
+        // return d;
       },
     },
     posts: {
       type: new GraphQLList(post),
-      async resolve() {
-        const d = await fetch(URL + 'posts').then((r) => r.json());
-        return d;
+      async resolve(_s, _a, c) {
+        return c.prisma.post.findMany();
+        // const d = await fetch(URL + 'posts').then((r) => r.json());
+        // return d;
       },
     },
     user: {
       type: user,
       args: { id: { type: UUIDType } },
-      async resolve(_, { id }) {
-        const d = await fetch(URL + 'users/' + id).then((r) => r.json());
-        return d;
+      async resolve(_, { id }, c) {
+        return c.prisma.user.findUnique({
+          where: {
+            id,
+          },
+        });
+        // const d = await fetch(URL + 'users/' + id).then((r) => r.json());
+        // return d;
       },
     },
     users: {
       type: new GraphQLList(user),
-      async resolve() {
-        const d = await fetch(URL + 'users').then((r) => r.json());
-        return d;
+      async resolve(_s, _a, c) {
+        // const d = await fetch(URL + 'users').then((r) => r.json());
+        // return d;
+        return c.prisma.user.findMany();
       },
     },
     profile: {
       type: profile,
       args: { id: { type: UUIDType } },
-      async resolve(_, { id }) {
-        const d = await fetch(URL + 'profiles/' + id).then((r) => r.json());
-        return d;
+      async resolve(_, { id }, c) {
+        return c.prisma.profile.findUnique({
+          where: {
+            id,
+          },
+        });
+        // const d = await fetch(URL + 'profiles/' + id).then((r) => r.json());
+        // return d;
       },
     },
     profiles: {
       type: new GraphQLList(profile),
-      async resolve() {
-        const d = await fetch(URL + 'profiles').then((r) => r.json());
-        return d;
+      async resolve(_s,_a,c) {
+        return c.prisma.profile.findMany();
+        // const d = await fetch(URL + 'profiles').then((r) => r.json());
+        // return d;
       },
     },
   },
